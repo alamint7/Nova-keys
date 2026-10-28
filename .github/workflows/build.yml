@@ -46,15 +46,16 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1.0
-          name: Nova Keys v1.1.0
+          tag_name: v1.2.0
+          name: Nova Keys v1.2.0
           body: |
-            Nova Keys v1.1.0 — redesigned Bengali/English keyboard.
+            Nova Keys v1.2.0 — Probhat layout and emoji keyboard.
 
             Highlights:
             - Compact Gboard/Ridmik-inspired icon toolbar
-            - English and phonetic Bengali typing
+            - English, phonetic Bengali, and Probhat Bengali layout
             - Clipboard actions and locally pinned snippets
+            - Emoji keyboard and one-tap layout switching
             - Theme switching
             - Updated teal Bengali অ + keyboard launcher icon
 
