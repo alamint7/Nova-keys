@@ -15,6 +15,8 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
     private var bn = false
     private var sym = false
     private var shift = 0
+    private var probhat = false
+    private var emojiMode = false
     private var clipboardMode = false
     private val buf = StringBuilder()
 
@@ -28,6 +30,7 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
         buf.clear()
         shift = 0
         sym = false
+        emojiMode = false
         clipboardMode = false
         if (::kv.isInitialized) refresh()
     }
@@ -41,31 +44,66 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
             sp.getInt("haptic", 15)
         )
         kv.shift = shift
-        kv.candidates = if (clipboardMode) pinnedClips().take(3) else BanglaPhonetic.candidates(buf.toString())
+        kv.candidates = when {
+            clipboardMode -> pinnedClips().take(3)
+            emojiMode -> listOf("😀", "😂", "🥰")
+            else -> if (probhat || !bn) emptyList() else BanglaPhonetic.candidates(buf.toString())
+        }
     }
 
     private fun chars(s: String, alt: String? = null) =
-        s.mapIndexed { i, c -> Key(c.toString(), alt = alt?.get(i)?.toString()) }
+        s.mapIndexed { i, c -> Key(c.toString(), alt = alt?.getOrNull(i)?.toString()) }
+
+    private fun row(s: String) = s.trim().split(Regex("\\s+")).map { Key(it) }
 
     private fun layout(sym: Boolean, numRow: Boolean, bn: Boolean): List<List<Key>> {
-        // Compact icon toolbar inspired by modern keyboards, not a row of C/X/V letter keys.
         val toolbar = listOf(
-            Key("▤", "CLIPBOARD", 1.65f, 1, "PIN"),
-            Key("▢", "COPY", 1.65f, 1),
-            Key("✂", "CUT", 1.65f, 1),
-            Key("▣", "PASTE", 1.65f, 1),
-            Key("◐", "THEME", 1.65f, 1),
-            Key("⚙", "SETTINGS", 1.65f, 1)
-        )
-        val bottom = listOf(
-            Key(if (sym) "ABC" else "?123", if (sym) "ABC" else "SYM", 1.4f, 1),
-            Key(if (bn) "বাং" else "EN", "LANG", 1.2f, 1),
-            Key(" ", "SPACE", 5f, 3),
-            Key(if (bn) "।" else ".", "."),
-            Key("⏎", "ENTER", 1.4f, 2)
+            Key("▤", "CLIPBOARD", 1.3f, 1, "PIN"),
+            Key("▢", "COPY", 1.15f, 1),
+            Key("✂", "CUT", 1.15f, 1),
+            Key("▣", "PASTE", 1.15f, 1),
+            Key("☺", "EMOJI", 1.15f, 1),
+            Key(if (probhat) "প্রভাত" else "অভ্র", "LAYOUT", 1.65f, 1),
+            Key("◐", "THEME", 1.15f, 1),
+            Key("⚙", "SETTINGS", 1.15f, 1)
         )
         val del = Key("⌫", "DEL", 1.5f, 1)
-        if (sym) return listOf(toolbar, chars("1234567890"), chars("@#৳_&-+()/"), chars("*\"':;!?=") + del, bottom)
+        val bottom = listOf(
+            Key(if (sym || emojiMode) "ABC" else "?123", if (sym || emojiMode) "ABC" else "SYM", 1.35f, 1),
+            Key(if (bn) "বাং" else "EN", "LANG", 1.1f, 1),
+            Key(",", ",", 0.8f),
+            Key("space", "SPACE", 4.3f, 3),
+            Key(if (bn) "।" else ".", ".", 0.8f),
+            Key("⏎", "ENTER", 1.3f, 2)
+        )
+
+        if (emojiMode) {
+            return listOf(
+                toolbar,
+                chars("😀 😃 😄 😁 😆 😅 😂 🙂 🙃 😉"),
+                chars("😊 😍 🥰 😘 😗 😙 😚 😋 😛 😜"),
+                chars("🤔 🤗 😎 😭 😡 👍 👎 🙏 ❤️"),
+                listOf(Key("ABC", "ABC", 1.5f, 1), Key("space", "SPACE", 5.5f, 3), del),
+                bottom
+            )
+        }
+        if (sym) return listOf(
+            toolbar, chars("1234567890"), chars("@#৳_&-+()/"), chars("*\\"':;!?=") + del, bottom
+        )
+
+        if (probhat && bn) {
+            // Probhat-style Bengali character layout; each key commits Bengali directly.
+            return listOfNotNull(
+                toolbar,
+                if (numRow) chars("1234567890") else null,
+                row("ৎ ং ঃ ঁ ় ৎ ঋ ৃ ৈ ৌ ূ ী"),
+                row("অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ"),
+                row("ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ"),
+                listOf(Key("⇧", "SHIFT", 1.35f, 1)) + row("ড ঢ ণ ত থ দ ধ ন প ফ ব ভ") + del,
+                listOf(Key("?123", "SYM", 1.35f, 1), Key("য", "য"), Key("র", "র"), Key("ল", "ল"), Key("স", "স"), Key("ম", "ম"), Key("হ", "হ"), Key("য়", "য়"), Key("space", "SPACE", 3.2f, 3), Key("⏎", "ENTER", 1.3f, 2)
+            )
+        }
+
         return listOfNotNull(
             toolbar,
             if (numRow) chars("1234567890") else null,
@@ -82,9 +120,18 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
             "DEL" -> del()
             "SPACE" -> { commitWord(); currentInputConnection?.commitText(" ", 1) }
             "ENTER" -> { commitWord(); enter() }
-            "SYM" -> sym = true
-            "ABC" -> sym = false
-            "LANG" -> { commitWord(); bn = !bn }
+            "SYM" -> { sym = true; emojiMode = false }
+            "ABC" -> { sym = false; emojiMode = false }
+            "LANG" -> { commitWord(); bn = !bn; if (!bn) probhat = false }
+            "LAYOUT" -> {
+                commitWord()
+                probhat = !probhat
+                bn = true
+                sym = false
+                emojiMode = false
+                toast(if (probhat) "Probhat layout" else "Phonetic layout")
+            }
+            "EMOJI" -> { commitWord(); emojiMode = !emojiMode; sym = false }
             "COPY" -> copySelection(cut = false)
             "CUT" -> copySelection(cut = true)
             "PASTE" -> pasteClipboard()
@@ -144,9 +191,7 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
         if (clipboardMode && clips.isEmpty()) {
             clipboardMode = false
             toast("No pinned text yet. Copy text and long-press the clipboard icon.")
-        } else if (clipboardMode) {
-            toast("Tap a snippet in the suggestion strip to paste it")
-        }
+        } else if (clipboardMode) toast("Tap a snippet in the suggestion strip to paste it")
     }
 
     private fun pinnedClips(): List<String> {
@@ -161,7 +206,13 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
 
     private fun type(c: String) {
         val ic = currentInputConnection ?: return
-        val letter = c[0].isLetter()
+        if (emojiMode || (probhat && bn)) {
+            commitWord()
+            ic.commitText(c, 1)
+            if (shift == 1) shift = 0
+            return
+        }
+        val letter = c.firstOrNull()?.isLetter() == true
         if (bn && !sym && letter) {
             buf.append(if (shift != 0) c.uppercase() else c)
             ic.setComposingText(BanglaPhonetic.convert(buf.toString()), 1)
@@ -200,6 +251,8 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
         if (clipboardMode) {
             currentInputConnection?.commitText(s, 1)
             clipboardMode = false
+        } else if (emojiMode) {
+            currentInputConnection?.commitText(s, 1)
         } else {
             currentInputConnection?.commitText(s, 1)
             buf.clear()
