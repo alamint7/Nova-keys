@@ -95,8 +95,12 @@ class KeyboardView(ctx: Context) : View(ctx) {
         }
         for ((k, r) in rects) {
             p.style = Paint.Style.FILL; p.color = fill(k)
-            c.drawRoundRect(r, 9 * d, 9 * d, p)
-            if (k === pressed) { p.color = 0x40808080; c.drawRoundRect(r, 9 * d, 9 * d, p) }
+            c.drawRoundRect(r, 10 * d, 10 * d, p)
+            p.style = Paint.Style.STROKE; p.strokeWidth = 0.8f * d
+            p.color = if (k === pressed) theme.accent else if (k.kind == 1) 0x24777777 else 0x18777777
+            c.drawRoundRect(r, 10 * d, 10 * d, p)
+            p.style = Paint.Style.FILL
+            if (k === pressed) { p.color = 0x40808080; c.drawRoundRect(r, 10 * d, 10 * d, p) }
             p.color = textCol(k); p.textSize = (if (k.kind == 0) 21 else 16) * d
             c.drawText(label(k), r.centerX(), r.centerY() + p.textSize * 0.35f, p)
             k.alt?.let { p.textSize = 10 * d; p.alpha = 150; c.drawText(it, r.right - 9 * d, r.top + 13 * d, p); p.alpha = 255 }
