@@ -80,9 +80,9 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
         if (emojiMode) {
             return listOf(
                 toolbar,
-                chars("😀 😃 😄 😁 😆 😅 😂 🙂 🙃 😉"),
-                chars("😊 😍 🥰 😘 😗 😙 😚 😋 😛 😜"),
-                chars("🤔 🤗 😎 😭 😡 👍 👎 🙏 ❤️"),
+                row("😀 😃 😄 😁 😆 😅 😂 🙂 🙃 😉"),
+                row("😊 😍 🥰 😘 😗 😙 😚 😋 😛 😜"),
+                row("🤔 🤗 😎 😭 😡 👍 👎 🙏 ❤️"),
                 listOf(Key("ABC", "ABC", 1.5f, 1), Key("space", "SPACE", 5.5f, 3), del),
                 bottom
             )
