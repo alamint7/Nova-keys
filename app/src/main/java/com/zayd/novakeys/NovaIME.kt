@@ -18,6 +18,7 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
     private var probhat = false
     private var emojiMode = false
     private var clipboardMode = false
+    private var toolbarVisible = true
     private val buf = StringBuilder()
 
     override fun onCreateInputView(): View {
@@ -37,8 +38,9 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
 
     private fun refresh() {
         val sp = getSharedPreferences("nova", MODE_PRIVATE)
+        toolbarVisible = sp.getBoolean("toolbar", true)
         kv.setup(
-            layout(sym, sp.getBoolean("numrow", true), bn),
+            layout(sym, sp.getBoolean("numrow", true), bn, toolbarVisible),
             Theme.all[sp.getInt("theme", 0).coerceIn(0, Theme.all.lastIndex)],
             sp.getInt("height", 100) / 100f,
             sp.getInt("haptic", 15)
@@ -56,8 +58,8 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
 
     private fun row(s: String) = s.trim().split(Regex("\\s+")).map { Key(it) }
 
-    private fun layout(sym: Boolean, numRow: Boolean, bn: Boolean): List<List<Key>> {
-        val toolbar = listOf(
+    private fun layout(sym: Boolean, numRow: Boolean, bn: Boolean, toolbarVisible: Boolean): List<List<Key>> {
+        val fullToolbar = listOf(
             Key("▤", "CLIPBOARD", 1.3f, 1, "PIN"),
             Key("▢", "COPY", 1.15f, 1),
             Key("✂", "CUT", 1.15f, 1),
@@ -66,6 +68,13 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
             Key(if (probhat) "প্রভাত" else "অভ্র", "LAYOUT", 1.65f, 1),
             Key("◐", "THEME", 1.15f, 1),
             Key("⚙", "SETTINGS", 1.15f, 1)
+        )
+        val toolbar = if (toolbarVisible) fullToolbar else listOf(
+            Key("☰", "TOOLBAR", 1.25f, 1),
+            Key(if (bn) "বাং" else "EN", "LANG", 1.1f, 1),
+            Key("☺", "EMOJI", 1.1f, 1),
+            Key(if (probhat) "প্রভাত" else "অভ্র", "LAYOUT", 1.5f, 1),
+            Key("⚙", "SETTINGS", 1.1f, 1)
         )
         val del = Key("⌫", "DEL", 1.5f, 1)
         val bottom = listOf(
@@ -117,6 +126,10 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
     override fun onKey(k: Key) {
         when (k.code) {
             "SHIFT" -> shift = (shift + 1) % 3
+            "TOOLBAR" -> {
+                toolbarVisible = !toolbarVisible
+                getSharedPreferences("nova", MODE_PRIVATE).edit().putBoolean("toolbar", toolbarVisible).apply()
+            }
             "DEL" -> del()
             "SPACE" -> { commitWord(); currentInputConnection?.commitText(" ", 1) }
             "ENTER" -> { commitWord(); enter() }
