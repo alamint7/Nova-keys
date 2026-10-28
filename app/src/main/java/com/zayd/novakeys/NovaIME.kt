@@ -88,7 +88,7 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
             )
         }
         if (sym) return listOf(
-            toolbar, chars("1234567890"), chars("@#৳_&-+()/"), chars("*\\"':;!?=") + del, bottom
+            toolbar, chars("1234567890"), chars("@#৳_&-+()/"), chars("*+-=!?;:") + del, bottom
         )
 
         if (probhat && bn) {
@@ -100,7 +100,7 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
                 row("অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ"),
                 row("ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ"),
                 listOf(Key("⇧", "SHIFT", 1.35f, 1)) + row("ড ঢ ণ ত থ দ ধ ন প ফ ব ভ") + del,
-                listOf(Key("?123", "SYM", 1.35f, 1), Key("য", "য"), Key("র", "র"), Key("ল", "ল"), Key("স", "স"), Key("ম", "ম"), Key("হ", "হ"), Key("য়", "য়"), Key("space", "SPACE", 3.2f, 3), Key("⏎", "ENTER", 1.3f, 2)
+                listOf(Key("?123", "SYM", 1.35f, 1), Key("য", "য"), Key("র", "র"), Key("ল", "ল"), Key("স", "স"), Key("ম", "ম"), Key("হ", "হ"), Key("য়", "য়"), Key("space", "SPACE", 3.2f, 3), Key("⏎", "ENTER", 1.3f, 2))
             )
         }
 
