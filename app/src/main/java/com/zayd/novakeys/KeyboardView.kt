@@ -9,12 +9,12 @@ import kotlin.math.max
 
 class Key(val label: String, val code: String = label, val w: Float = 1f, val kind: Int = 0, val alt: String? = null)
 
-class Theme(val bg: Int, val key: Int, val text: Int, val fn: Int, val accent: Int, val accentText: Int) {
+class Theme(val bg: Int, val key: Int, val text: Int, val fn: Int, val accent: Int, val accentText: Int, val orbit: Boolean = false) {
     companion object {
-        val names = listOf("Matte Chalk", "Matte Graphite", "AMOLED Black")
+        val names = listOf("Orbit Board", "Nothing Dark", "AMOLED Black")
         val all = listOf(
-            Theme(0xFFE7E2DA.toInt(), 0xFFF5F1EA.toInt(), 0xFF1E1F23.toInt(), 0xFFD3CBC0.toInt(), 0xFFD9A93E.toInt(), 0xFF1E1F23.toInt()),
-            Theme(0xFF1E1F23.toInt(), 0xFF2D2F35.toInt(), 0xFFECE7E0.toInt(), 0xFF3B4E6B.toInt(), 0xFFD9A93E.toInt(), 0xFF1E1F23.toInt()),
+            Theme(0xFF000000.toInt(), 0xFF1C1D21.toInt(), 0xFFF5F3F0.toInt(), 0xFF1C1D21.toInt(), 0xFFE5BD39.toInt(), 0xFF151515.toInt(), true),
+            Theme(0xFF111114.toInt(), 0xFF25262B.toInt(), 0xFFF3F3F5.toInt(), 0xFF303137.toInt(), 0xFFE21E2A.toInt(), 0xFFFFFFFF.toInt()),
             Theme(0xFF000000.toInt(), 0xFF141414.toInt(), 0xFFEDEDED.toInt(), 0xFF222222.toInt(), 0xFFB9473A.toInt(), 0xFFFFFFFF.toInt())
         )
     }
@@ -38,6 +38,7 @@ class KeyboardView(ctx: Context) : View(ctx) {
     private var longDone = false
     private val h = Handler(Looper.getMainLooper())
     private val vib = ctx.getSystemService(Vibrator::class.java)
+    private val orbitPalette = intArrayOf(0xFFE5BD39.toInt(), 0xFF31598C.toInt(), 0xFF1C1D21.toInt(), 0xFFF2F0EC.toInt(), 0xFFC83239.toInt(), 0xFF31598C.toInt(), 0xFFF2F0EC.toInt(), 0xFFC83239.toInt())
 
     private val repeat = object : Runnable {
         override fun run() { pressed?.let { if (it.code == "DEL") { listener?.onKey(it); h.postDelayed(this, 55) } } }
@@ -61,6 +62,7 @@ class KeyboardView(ctx: Context) : View(ctx) {
 
     private fun layoutKeys() {
         rects.clear()
+        if (rows.isEmpty()) return
         val unit = width / max(10f, rows.maxOf { r -> r.sumOf { it.w.toDouble() }.toFloat() })
         rows.forEachIndexed { ri, row ->
             var x = (width - row.sumOf { it.w.toDouble() }.toFloat() * unit) / 2
@@ -69,16 +71,27 @@ class KeyboardView(ctx: Context) : View(ctx) {
         }
     }
 
-    private fun fill(k: Key) = when {
-        k.code == "SHIFT" && shift != 0 -> theme.accent
-        k.kind == 1 -> theme.fn
-        k.kind == 2 -> theme.accent
-        else -> theme.key
+    private fun fill(k: Key): Int {
+        if (theme.orbit && k.kind == 0 && k.code.length == 1) {
+            val index = rects.indexOfFirst { it.first === k }.coerceAtLeast(0)
+            return orbitPalette[(index + index / 10) % orbitPalette.size]
+        }
+        return when {
+            k.code == "SHIFT" && shift != 0 -> theme.accent
+            k.kind == 1 -> theme.fn
+            k.kind == 2 -> theme.accent
+            else -> theme.key
+        }
     }
-    private fun textCol(k: Key) = if (fill(k) == theme.accent) theme.accentText else theme.text
+    private fun textCol(k: Key): Int {
+        val color = fill(k)
+        return if (color == theme.accent || color == 0xFFE5BD39.toInt() || color == 0xFFC83239.toInt()) Color.WHITE.let {
+            if (color == 0xFFE5BD39.toInt() || color == 0xFFF2F0EC.toInt()) 0xFF151515.toInt() else it
+        } else theme.text
+    }
     private fun label(k: Key) = when {
         k.code == "SHIFT" -> if (shift == 2) "⇪" else "⇧"
-        k.kind == 0 && shift != 0 && k.label[0].isLetter() -> k.label.uppercase()
+        k.kind == 0 && shift != 0 && k.label.firstOrNull()?.isLetter() == true -> k.label.uppercase()
         else -> k.label
     }
 
@@ -102,14 +115,16 @@ class KeyboardView(ctx: Context) : View(ctx) {
             k.alt?.let { p.textSize = 10 * d; p.alpha = 150; c.drawText(it, r.right - 9 * d, r.top + 13 * d, p); p.alpha = 255 }
         }
         pressed?.takeIf { it.kind == 0 && it.code.length == 1 }?.let { k ->
-            val r = rects.first { it.first === k }.second
-            val bw = r.width() * 1.35f; val bh = 44 * d
-            val b = RectF(r.centerX() - bw / 2, max(0f, r.top - 2 * d - bh), r.centerX() + bw / 2, max(0f, r.top - 2 * d - bh) + bh)
-            b.offset(if (b.left < 0) -b.left else if (b.right > width) width - b.right else 0f, 0f)
-            p.style = Paint.Style.FILL; p.color = fill(k); c.drawRoundRect(b, 12 * d, 12 * d, p)
-            p.style = Paint.Style.STROKE; p.strokeWidth = 2 * d; p.color = theme.accent; c.drawRoundRect(b, 12 * d, 12 * d, p)
-            p.style = Paint.Style.FILL; p.color = textCol(k); p.textSize = 26 * d
-            c.drawText(label(k), b.centerX(), b.centerY() + 9 * d, p)
+            val r = rects.firstOrNull { it.first === k }?.second
+            if (r != null) {
+                val bw = r.width() * 1.35f; val bh = 44 * d
+                val b = RectF(r.centerX() - bw / 2, max(0f, r.top - 2 * d - bh), r.centerX() + bw / 2, max(0f, r.top - 2 * d - bh) + bh)
+                b.offset(if (b.left < 0) -b.left else if (b.right > width) width - b.right else 0f, 0f)
+                p.style = Paint.Style.FILL; p.color = fill(k); c.drawRoundRect(b, 12 * d, 12 * d, p)
+                p.style = Paint.Style.STROKE; p.strokeWidth = 2 * d; p.color = theme.accent; c.drawRoundRect(b, 12 * d, 12 * d, p)
+                p.style = Paint.Style.FILL; p.color = textCol(k); p.textSize = 26 * d
+                c.drawText(label(k), b.centerX(), b.centerY() + 9 * d, p)
+            }
         }
     }
 
