@@ -60,14 +60,15 @@ class NovaIME : InputMethodService(), KeyboardView.Listener {
 
     private fun layout(sym: Boolean, numRow: Boolean, bn: Boolean, toolbarVisible: Boolean): List<List<Key>> {
         val fullToolbar = listOf(
-            Key("▤", "CLIPBOARD", 1.3f, 1, "PIN"),
-            Key("▢", "COPY", 1.15f, 1),
-            Key("✂", "CUT", 1.15f, 1),
-            Key("▣", "PASTE", 1.15f, 1),
-            Key("☺", "EMOJI", 1.15f, 1),
-            Key(if (probhat) "প্রভাত" else "অভ্র", "LAYOUT", 1.65f, 1),
-            Key("◐", "THEME", 1.15f, 1),
-            Key("⚙", "SETTINGS", 1.15f, 1)
+            Key("▤", "CLIPBOARD", 1.1f, 1, "PIN"),
+            Key("▢", "COPY", 0.9f, 1),
+            Key("✂", "CUT", 0.9f, 1),
+            Key("▣", "PASTE", 0.9f, 1),
+            Key("☺", "EMOJI", 1.0f, 1),
+            Key(if (probhat) "প্রভাত" else "অভ্র", "LAYOUT", 1.4f, 1),
+            Key("◐", "THEME", 0.9f, 1),
+            Key("⚙", "SETTINGS", 0.9f, 1),
+            Key("⌄", "TOOLBAR", 0.9f, 1)
         )
         val toolbar = if (toolbarVisible) fullToolbar else listOf(
             Key("☰", "TOOLBAR", 1.25f, 1),
