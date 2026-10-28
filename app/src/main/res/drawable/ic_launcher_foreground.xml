@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#172033" android:pathData="M0,0h108v108h-108z"/>
-    <path android:fillColor="#F4F0E8" android:pathData="M27,27h54a8,8 0,0 1,8 8v38a8,8 0,0 1,-8 8h-54a8,8 0,0 1,-8 -8v-38a8,8 0,0 1,8 -8z"/>
-    <path android:fillColor="#172033" android:pathData="M31,36h10v14l13,-14h13l-16,17 17,19h-13l-14,-16v16h-10z"/>
-    <path android:fillColor="#D9A93E" android:pathData="M75,29l2.8,6.2 6.2,2.8 -6.2,2.8 -2.8,6.2 -2.8,-6.2 -6.2,-2.8 6.2,-2.8z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Dark keyboard body -->
+    <path android:fillColor="#253149" android:pathData="M15,45 L93,45 Q99,45 99,52 L99,91 Q99,98 92,98 L16,98 Q9,98 9,91 L9,52 Q9,45 15,45 Z"/>
+    <!-- Keycaps -->
+    <path android:fillColor="#E6EEFF" android:pathData="M20,56 Q20,53 23,53 H30 Q33,53 33,56 V62 Q33,65 30,65 H23 Q20,65 20,62 Z M38,56 Q38,53 41,53 H48 Q51,53 51,56 V62 Q51,65 48,65 H41 Q38,65 38,62 Z M57,56 Q57,53 60,53 H67 Q70,53 70,56 V62 Q70,65 67,65 H60 Q57,65 57,62 Z M76,56 Q76,53 79,53 H86 Q89,53 89,56 V62 Q89,65 86,65 H79 Q76,65 76,62 Z"/>
+    <path android:fillColor="#E6EEFF" android:pathData="M20,69 Q20,66 23,66 H30 Q33,66 33,69 V75 Q33,78 30,78 H23 Q20,78 20,75 Z M38,69 Q38,66 41,66 H48 Q51,66 51,69 V75 Q51,78 48,78 H41 Q38,78 38,75 Z M57,69 Q57,66 60,66 H67 Q70,66 70,69 V75 Q70,78 67,78 H60 Q57,78 57,75 Z M76,69 Q76,66 79,66 H86 Q89,66 89,69 V75 Q89,78 86,78 H79 Q76,78 76,75 Z"/>
+    <path android:fillColor="#DCE8FF" android:pathData="M29,82 H79 Q82,82 82,85 V88 Q82,91 79,91 H29 Q26,91 26,88 V85 Q26,82 29,82 Z"/>
+    <!-- Teal Bengali speech badge -->
+    <path android:fillColor="#05B9C4" android:pathData="M34,9 H74 Q86,9 86,21 V51 Q86,61 77,67 L54,85 L31,67 Q22,61 22,51 V21 Q22,9 34,9 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M32,25 H76 Q78,25 78,27 V31 Q78,33 76,33 H58 V53 Q58,58 54,62 Q49,67 42,64 Q34,61 34,53 Q34,46 40,42 Q45,39 50,43 Q53,45 51,48 Q49,51 46,49 Q43,47 41,50 Q39,54 43,57 Q47,60 51,56 Q53,54 53,50 V33 H32 Q30,33 30,31 V27 Q30,25 32,25 Z"/>
 </vector>
