@@ -4,7 +4,7 @@ Offline Android keyboard by **Zayd** — English QWERTY + Avro-style phonetic Be
 
 Features: Orbit Board multicolour theme, Nothing Dark and AMOLED Black themes, popup key bubbles, number row toggle, long-press digits, haptics with adjustable strength, adjustable height, Bengali candidate bar, no INTERNET permission, no analytics.
 
-## Download the APK (v1.1.0)
+## Download the APK (v1.2.30)
 
 1. Open the [Actions build page](https://github.com/alamint7/Nova-keys/actions/workflows/build.yml).
 2. Open the latest successful **Build Nova Keys APK** run.
