@@ -46,12 +46,19 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: Nova Keys v1.0.0
+          tag_name: v1.1.0
+          name: Nova Keys v1.1.0
           body: |
-            First public build of Nova Keys, an offline English and phonetic Bengali Android keyboard.
+            Nova Keys v1.1.0 — redesigned Bengali/English keyboard.
 
-            Install `app-debug.apk` on Android. This is a debug APK, not a Play Store-signed release build.
+            Highlights:
+            - Compact Gboard/Ridmik-inspired icon toolbar
+            - English and phonetic Bengali typing
+            - Clipboard actions and locally pinned snippets
+            - Theme switching
+            - Updated teal Bengali অ + keyboard launcher icon
+
+            Install app-debug.apk on Android. This is a debug APK, not a Play Store-signed release build.
           files: app/build/outputs/apk/debug/app-debug.apk
           fail_on_unmatched_files: true
           make_latest: true
